@@ -1,5 +1,5 @@
 # poordriving.py
-### An Aircrack wrapper for schmucks who can't afford internet
+### An Aircrack wrapper for homies who can't afford internet
 
 #### Instructions for use:
 
