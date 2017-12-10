@@ -9,6 +9,7 @@ I'm not your lawyer.
 import curses
 import threading
 import datetime as dt
+from os import geteuid
 from time import sleep
 import subprocess as sp
 from pathlib import Path
@@ -258,11 +259,6 @@ class Overseer():
             self.airodump.terminate()
         except:
             pass
-        for network in self.networks:
-            try:
-                network.process.terminate()
-            except:
-                continue
         self.monitor.join()
         self.main_loop.join()
 
@@ -271,10 +267,15 @@ class Overseer():
 
         try:
             cmd = ['airodump-ng', '--write-interval', '1', '--update', '999', '-c', str(self.channel), '-w', self.temp_dir.name + '/data', self.interface]
-            self.airodump = sp.run(cmd, check=True, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
+            print('>> {}'.format(' '.join(cmd)))
+            self.airodump = sp.run(cmd, check=True, stdout=sp.DEVNULL, stderr=sp.PIPE)
 
-        except sp.CalledProcessError as e:
-            stderr.write('[!] Error in airodump process:\n\t{}'.format(self.airodump.stdout.decode()))
+        except sp.CalledProcessError:
+            self.terminate = True
+            try:
+                stderr.write('[!] Error in airodump process:\n\t{}'.format(self.airodump.stderr.decode()))
+            except:
+                pass
 
         finally:
             cmd = ['mv', self.temp_dir.name + '/data-01.cap', self.write]
@@ -324,6 +325,7 @@ class Overseer():
 
     def deauth_network(self, network):
 
+        # Keeps going as long as the network has been seen recently, and there isn't a handshake yet.
         while not network.handshake and (dt.datetime.now() - network.last_seen).total_seconds() < self.max_time:
             for result in network.deauth(dry_run=self.dry_run, interval=self.interval):
                 with self.dlock:
@@ -416,6 +418,7 @@ if __name__ == '__main__':
     try:
 
         options = parser.parse_args()
+        assert geteuid() == 0, "Please sudo me"
         if options.blacklist:
             options.blacklist = options.blacklist.split(',')
         if options.whitelist:
