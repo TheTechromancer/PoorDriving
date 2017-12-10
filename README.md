@@ -5,8 +5,8 @@
 
 <ol>
     <li>Spend six months to a year befriending network administrators in your area.  Become poor.</li>
-    <li>Go door-to-door down the street which you intend to "PoorDrive", obtaining permission to run this tool.</li>
-    <li>Create whitelist of SSIDs for which you have permission to test.  Take out a loan and hire an expensive lawyer.</li>
+    <li>Down the street which you intend to "PoorDrive", go door-to-door obtaining permission to run this tool.</li>
+    <li>Create whitelist containing MAC addresses which you have permission to test.  Take out a loan and hire an expensive lawyer.</li>
     <li>Blissfully PoorDrive down aforementioned street, capturing buttloads of (authorized) WPA handshakes.</li>
 </ol>
 <br>
