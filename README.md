@@ -1,5 +1,5 @@
 # poordriving.py
-### An airodump-ng wrapper for homies who can't afford internet
+### A handshake harvester for the poor and destitute
 
 #### Instructions for use:
 
