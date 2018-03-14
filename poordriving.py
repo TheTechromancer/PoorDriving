@@ -178,6 +178,7 @@ class Overseer():
         self.temp_dir           = TemporaryDirectory()
 
         self.terminate          = False
+        self.errormsg           = ''
 
 
     def start(self):
@@ -259,27 +260,27 @@ class Overseer():
             self.airodump.terminate()
         except:
             pass
-        self.monitor.join()
         self.main_loop.join()
+        self.monitor.join()
+
+        stderr.write(self.errormsg)
+        stderr.flush()
 
 
     def run(self):
 
         try:
-            cmd = ['airodump-ng', '--write-interval', '1', '--update', '999', '-c', str(self.channel), '-w', self.temp_dir.name + '/data', self.interface]
-            print('>> {}'.format(' '.join(cmd)))
-            self.airodump = sp.run(cmd, check=True, stdout=sp.DEVNULL, stderr=sp.PIPE)
+            cmd = ['airodump-ng', '--write-interval', '1', '--update', '999999', '-c', str(self.channel), '-w', self.temp_dir.name + '/data', self.interface]
+           # print('>> {}'.format(' '.join(cmd)))
+            self.airodump = sp.run(cmd, check=True, stdout=sp.PIPE, stderr=sp.PIPE)
 
-        except sp.CalledProcessError:
+        except sp.CalledProcessError as e:
+            self.errormsg = '[!] Error in airodump process:\n\t{}\n'.format(e.stderr.decode())
             self.terminate = True
-            try:
-                stderr.write('[!] Error in airodump process:\n\t{}'.format(self.airodump.stderr.decode()))
-            except:
-                pass
 
         finally:
             cmd = ['mv', self.temp_dir.name + '/data-01.cap', self.write]
-            self.airodump = sp.run(cmd, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
+            sp.run(cmd, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
             self.temp_dir.cleanup()
 
 
@@ -426,6 +427,7 @@ if __name__ == '__main__':
 
         o = Overseer(options.channel, options.interface, options.save, options.blacklist, options.whitelist, options.interval, options.dry_run, options.debug)
         o.start()
+        o.stop()
 
 
     except ArgumentError:
