@@ -468,7 +468,7 @@ def get_interfaces():
             try:
                 # if interface has an IP address
                 if sp.run(['ip', '-o', 'addr', 'show', 'dev', ifc_name], stdout=sp.PIPE, check=True).stdout.decode():
-                    # places it at the end of the list
+                    # place it at the end of the list
                     wlan_interfaces.append(ifc_name)
                 else:
                     # otherwise, place it at the beginning
